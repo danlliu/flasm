@@ -25,7 +25,10 @@ _start:
           mov       byte [rax+0xc], 10
           mov       byte [rax+0xd], 0
           mov       rdi, rax
+          mov       rbx, rax
           call      puts
+          mov       rdi, rbx
+          call      free
           xor       rdi, rdi
           call      exit
 

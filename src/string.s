@@ -13,7 +13,8 @@
 
           section   .text
 
-strlen:   mov       rbx, rdi
+strlen:   push      rbx
+          mov       rbx, rdi
           mov       rax, 1
 .loop:    mov       rcx, [rbx]
           test      rcx, rcx
@@ -21,4 +22,5 @@ strlen:   mov       rbx, rdi
           inc       rbx
           inc       rax
           jmp       .loop
-.endloop: ret
+.endloop: pop       rbx
+          ret

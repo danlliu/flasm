@@ -15,10 +15,12 @@
 
           section   .text
 
-puts:     call      strlen
+puts:     push      rbx
+          call      strlen
           mov       rdx, rax
           mov       rsi, rdi
           mov       rax, 1                  ; syscall write
           mov       rdi, 1                  ; stdout
           syscall
+          pop       rbx
           ret

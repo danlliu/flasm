@@ -8,3 +8,4 @@
 ;
 
           extern    malloc
+          extern    free
