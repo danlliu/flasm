@@ -9,16 +9,5 @@
 ; all others caller saved
 
 ; globals
-          global    strlen
 
           section   .text
-
-strlen:   mov       rbx, rdi
-          mov       rax, 1
-.loop:    mov       rcx, [rbx]
-          test      rcx, rcx
-          jz        strlen.endloop
-          inc       rbx
-          inc       rax
-          jmp       .loop
-.endloop: ret

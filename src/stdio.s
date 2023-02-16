@@ -5,11 +5,12 @@
 ; rdi, rsi, rdx, r10, r8, r9, then stack if needed
 ; return in rax
 ;
-; rax, rbx, rcx, r12, r13, r14, r15 caller saved
-; rdx, rdi, rsx, r8,  r9,  r10, r11 callee saved
+; rbx, rsp, rbp, r12, r13, r14, r15 callee saved
+; all others caller saved
 
           %include  "string.i"
 
+; globals
           global    puts
 
           section   .text
