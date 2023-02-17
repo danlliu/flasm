@@ -1,36 +1,47 @@
 ;label:   opcode    operands, operands      ; comment
 
           %include "malloc.i"
+          %include "socket.i"
           %include "stdio.i"
           %include "stdlib.i"
+          %include "string.i"
 
           global    _start
 
           section   .text
 _start:   
-          mov       rdi, 14
-          call      malloc
-          mov       byte [rax+0x0], 72
-          mov       byte [rax+0x1], 101
-          mov       byte [rax+0x2], 108
-          mov       byte [rax+0x3], 108
-          mov       byte [rax+0x4], 111
-          mov       byte [rax+0x5], 44
-          mov       byte [rax+0x6], 32
-          mov       byte [rax+0x7], 87
-          mov       byte [rax+0x8], 111
-          mov       byte [rax+0x9], 114
-          mov       byte [rax+0xa], 108
-          mov       byte [rax+0xb], 100
-          mov       byte [rax+0xc], 10
-          mov       byte [rax+0xd], 0
+          push      rbp
+          mov       rbp, rsp
+          sub       rsp, 24
+          mov       rdi, AF_INET
+          mov       rsi, SOCK_STREAM
+          xor       rdx, rdx
+          call      socket
+          mov       [rbp-24], rax
+          mov       rdi, 0x401f              ; 8000, big endian 2B
+          mov       esi, LOCALHOST_PUB
+          call      sockaddr_in
+          mov       [rbp-16], rax
+          mov       rdi, [rbp-24]
+          mov       rsi, rax
+          call      bind
+          mov       rdi, [rbp-24]
+          mov       rsi, 10
+          call      listen
+          call      sockaddr_in
+          mov       rdi, [rbp-24]
+          mov       rsi, rax
+          call      accept
+          mov       [rbp-8], rax
+
           mov       rdi, rax
-          mov       rbx, rax
-          call      puts
-          mov       rdi, rbx
-          call      free
+          lea       rsi, message
+          mov       rdx, 13
+          xor       r10, r10
+          call      send
+
           xor       rdi, rdi
           call      exit
 
           section   .data
-message:  db        "Hello, World", 10      ; note the newline at the end
+message:  db        "Hello, World", 10, 0

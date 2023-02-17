@@ -10,6 +10,7 @@
 
 ; globals
           global    strlen
+          global    strcpy
 
           section   .text
 
@@ -23,4 +24,14 @@ strlen:   push      rbx
           inc       rax
           jmp       .loop
 .endloop: pop       rbx
+          ret
+
+strcpy:   push      rbx
+.loop:    mov       dl, [rsi]
+          mov       [rdi], dl
+          inc       rdi
+          inc       rsi
+          test      dl, dl
+          jnz       strcpy.loop
+.end:     pop       rbx
           ret
