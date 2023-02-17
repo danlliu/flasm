@@ -1,15 +1,20 @@
 
-SRCS=$(wildcard src/*.s)
-OBJS=$(SRCS:.s=.o)
+LIB_SRCS=$(wildcard src/*.s)
+LIB_OBJS=$(LIB_SRCS:.s=.o)
+TEST_SRCS=$(wildcard tst/test_*.s)
+TEST_EXES=$(TEST_SRCS:tst/%.s=%)
 
 %.o: %.s
 	nasm -felf64 -i src $^
 
-main: $(OBJS)
+main: $(LIB_OBJS)
+	ld -o $@ $^
+
+test_%: tst/test_%.o
 	ld -o $@ $^
 
 .PHONY: all
-all: main
+all: main $(TEST_EXES)
 
 .PHONY: clean
 clean:

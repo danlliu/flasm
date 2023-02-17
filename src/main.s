@@ -29,19 +29,35 @@ _start:
           mov       rsi, 10
           call      listen
           call      sockaddr_in
+
           mov       rdi, [rbp-24]
           mov       rsi, rax
           call      accept
           mov       [rbp-8], rax
 
-          mov       rdi, rax
+          lea       rdi, message
+          call      strlen
+
+          mov       rdi, [rbp-8]
           lea       rsi, message
-          mov       rdx, 13
+          mov       rdx, rax
           xor       r10, r10
           call      send
+
+          mov       rdi, [rbp-24]
+          mov       rsi, SHUTDOWN_ALL
+          call      shutdown
+
+          mov       rdi, [rbp-24]
+          mov       rsi, SHUTDOWN_ALL
+          call      shutdown
 
           xor       rdi, rdi
           call      exit
 
           section   .data
-message:  db        "Hello, World", 10, 0
+message:  db        "HTTP/1.1 200 OK", 13, 10
+          db        "Content-Type: text/plain", 13, 10
+          db        "Content-Length: 15", 13, 10, 13, 10
+          db        "Hello from x86!", 13, 10
+          db        0

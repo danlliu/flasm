@@ -18,6 +18,7 @@
           global    listen
           global    accept
           global    send
+          global    shutdown
 
 %define   AF_INET       0x2
 
@@ -71,6 +72,12 @@ send:     push      rbx
           mov       r8, 0
           mov       r9, 0
           mov       rax, 44                 ; syscall sendto
+          syscall
+          pop       rbx
+          ret
+
+shutdown: push      rbx
+          mov       rax, 48                 ; syscall shutdown
           syscall
           pop       rbx
           ret

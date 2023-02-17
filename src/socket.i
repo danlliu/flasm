@@ -9,6 +9,7 @@
 ;  - listen (rdi = sockfd, rsi = backlog)
 ;  - accept (rdi = sockfd, rsi = sockaddr_in* addr)
 ;  - send (rdi = sockfd, rsi = char* buf, rdx = uint64 len, r10 = uint64 flags)
+;  - shutdown (rdi = sockfd, rsi = int how)
 ;
 ; macros:
 ;  - AF_INET: IPv4 (= 0x2)
@@ -24,6 +25,7 @@
           extern    listen
           extern    accept
           extern    send
+          extern    shutdown
 
 %define   AF_INET       0x2
 %define   AF_INET6      0x10
@@ -31,3 +33,4 @@
 %define   SOCK_DGRAM    0x2
 %define   LOCALHOST     0x0100007F
 %define   LOCALHOST_PUB 0x00000000
+%define   SHUTDOWN_ALL  2
