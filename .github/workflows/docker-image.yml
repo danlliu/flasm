@@ -15,8 +15,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag flasm:$(date +%s)
+      run: docker build . --file Dockerfile --tag flasm
     - name: Run the Docker image
-      run: docker run --name flasm -d -it --rm -p 8000:8000 --platform=linux/amd64 flasm:$(date +%s)
+      run: docker run --name flasm -d -it --rm -p 8000:8000 --platform=linux/amd64 flasm
     - name: Run tests
       run: docker exec -it flasm ./test
