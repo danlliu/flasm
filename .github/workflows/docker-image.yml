@@ -19,4 +19,4 @@ jobs:
     - name: Run the Docker image
       run: docker run --name flasm -d -it --rm -p 8000:8000 --platform=linux/amd64 flasm
     - name: Run tests
-      run: docker exec -it flasm ./test
+      run: docker exec -i flasm ./test
