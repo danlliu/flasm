@@ -1,0 +1,22 @@
+name: Run all test cases
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag flasm:$(date +%s)
+    - name: Run the Docker image
+      run: docker run --name flasm -d -it --rm -p 8000:8000 --platform=linux/amd64 flasm:$(date +%s)
+    - name: Run tests
+      run: docker exec -it flasm ./test
