@@ -12,7 +12,7 @@
 _start:   
           push      rbp
           mov       rbp, rsp
-          sub       rsp, 24
+          sub       rsp, 32
           mov       rdi, AF_INET
           mov       rsi, SOCK_STREAM
           xor       rdx, rdx

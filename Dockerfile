@@ -10,6 +10,9 @@ COPY src src
 COPY tst tst
 COPY Makefile Makefile
 
+# Scripts
+COPY run_tests.sh test 
+
 RUN make all
 
 # Have fun :)
