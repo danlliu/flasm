@@ -25,6 +25,7 @@
 ;  - String_grow (rdi = String*) -> void [ modifies rdi ]
 ;  - String_append (rdi = String*, rsi = char c) -> void [ modifies rdi ]
 ;  - String_concat (rdi = String*, rsi = String*) -> void [ modifies rdi ]
+;  - String_compare (rdi = String*, rsi = String* other) -> result (-/0/+)
 ;  - String_starts_with (rdi = String*, rsi = String* prefix) -> bool (0/1)
 ;
 ;  String utility methods
@@ -51,4 +52,5 @@
           extern    String_change_capacity
           extern    String_append
           extern    String_concat
-
+          extern    String_compare
+          extern    String_starts_with

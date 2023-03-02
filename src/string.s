@@ -30,6 +30,8 @@
           global    String_change_capacity
           global    String_append
           global    String_concat
+          global    String_compare
+          global    String_starts_with
 
           section   .text
 
@@ -68,10 +70,7 @@ strcmp:
           jne       strcmp.ret
           test      al, al
           jnz       strcmp.loop
-.ret:     mov       al, cl
-          cbw
-          cwde
-          cdqe
+.ret:     movsx     rax, cl
           ret
 
 ;
@@ -341,6 +340,35 @@ String_concat:
           mov       rsi, [rbp-16]
           call      strcpy
           leave
+          ret
+
+String_compare:
+          call      String_get_data
+          mov       rdi, rsi
+          mov       rsi, rax
+          call      String_get_data
+          mov       rdi, rax
+          xchg      rdi, rsi
+          call      strcmp
+          ret
+
+String_starts_with:
+          call      String_get_data
+          mov       rdi, rsi
+          mov       rsi, rax
+          call      String_get_data
+          mov       rdi, rax
+          xchg      rdi, rsi
+.loop     lodsb
+          test      al, al
+          jz        String_starts_with.end
+          mov       cl, [rdi]
+          inc       rdi
+          cmp       al, cl
+          je        String_starts_with.loop
+          mov       al, 1
+.end      xor       al, 1
+          movsx     rax, al
           ret
 
 ;
