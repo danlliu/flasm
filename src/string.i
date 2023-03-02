@@ -35,6 +35,8 @@
           extern    memset
           extern    strlen
           extern    strcpy
+          extern    strcmp
+
           extern    String_ctor_empty
           extern    String_ctor_cstr
           extern    String_ctor_copy

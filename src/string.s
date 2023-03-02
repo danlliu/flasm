@@ -14,6 +14,7 @@
           global    memset
           global    strlen
           global    strcpy
+          global    strcmp
 
           global    String_ctor_empty
           global    String_ctor_cstr
@@ -42,8 +43,7 @@ memset:
           rep stosb     
           ret
 
-strlen:   push      rbx
-          mov       rsi, rdi
+strlen:   mov       rsi, rdi
           mov       rcx, 0
 .loop:    lodsb
           test      al, al
@@ -51,15 +51,27 @@ strlen:   push      rbx
           inc       rcx
           jmp       .loop
 .endloop: mov       rax, rcx
-          pop       rbx
           ret
 
-strcpy:   push      rbx
+strcpy:   
 .loop:    lodsb
           stosb
           test      al, al
           jnz       strcpy.loop
-.end:     pop       rbx
+.end:     ret
+
+strcmp:   
+.loop:    lodsb
+          mov       cl, [rdi]
+          inc       rdi
+          sub       cl, al
+          jne       strcmp.ret
+          test      al, al
+          jnz       strcmp.loop
+.ret:     mov       al, cl
+          cbw
+          cwde
+          cdqe
           ret
 
 ;
