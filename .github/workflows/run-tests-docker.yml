@@ -1,4 +1,4 @@
-name: Run all test cases
+name: Run all test cases (Docker)
 
 on:
   push:
