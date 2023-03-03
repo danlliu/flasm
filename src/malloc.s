@@ -93,14 +93,10 @@ malloc:
 .zrax:    mov       rbx, 32                 ; = s
           mov       rcx, 0                  ; = i
           
-.floop:   test      rax, rbx
-          jl        malloc.floop_b
-          mov       rdx, [chunktbl+rcx*8]
-          test      rdx, rdx
-          jnz       malloc.floop_e
-          cmp       rbx, 4096
-          jne       malloc.floop_b
-          mov       r12, rax
+.floop:   cmp       rax, rbx
+          jle       malloc.floop_b
+          jmp       malloc.floop_s
+.alloc:   mov       r12, rax
           mov       r13, rcx
           mov       rax, 9                  ; syscall mmap
           mov       rdi, 0
@@ -115,7 +111,12 @@ malloc:
           mov       rax, r12
           jmp       malloc.floop_e
 .floop_b: 
-          shl       rbx, 1
+          mov       rdx, [chunktbl+rcx*8]
+          test      rdx, rdx
+          jnz       malloc.floop_e
+          cmp       rbx, 4096
+          je        malloc.alloc
+.floop_s: shl       rbx, 1
           inc       rcx
           jmp       malloc.floop
 .floop_e: 

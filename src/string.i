@@ -54,3 +54,5 @@
           extern    String_concat
           extern    String_compare
           extern    String_starts_with
+
+          extern    String_from_int

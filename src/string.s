@@ -15,6 +15,7 @@
           global    strlen
           global    strcpy
           global    strcmp
+          global    strrev
 
           global    String_ctor_empty
           global    String_ctor_cstr
@@ -32,6 +33,8 @@
           global    String_concat
           global    String_compare
           global    String_starts_with
+
+          global    String_from_int
 
           section   .text
 
@@ -71,6 +74,27 @@ strcmp:
           test      al, al
           jnz       strcmp.loop
 .ret:     movsx     rax, cl
+          ret
+
+strrev:
+          push      rbp
+          mov       rbp, rsp
+          sub       rsp, 16
+          mov       [rbp-8], rdi
+          call      strlen
+          dec       rax
+          mov       rdi, [rbp-8]
+          mov       rsi, [rbp-8]
+          add       rsi, rax
+.loop:    cmp       rdi, rsi
+          jge       strrev.end
+          mov       cl, [rdi]
+          xchg      cl, [rsi]
+          xchg      cl, [rdi]
+          inc       rdi
+          dec       rsi
+          jmp       strrev.loop
+.end:     leave
           ret
 
 ;
@@ -294,10 +318,10 @@ String_append:
           mov       [rbp-8], rdi
           mov       [rbp-16], rsi
           call      String_get_capacity
-          mov       rcx, rax
+          mov       ecx, eax
           call      String_get_size
-          inc       rax
-          cmp       rax, rcx
+          inc       eax
+          cmp       eax, ecx
           jle       String_append.nogrow
           call      String_grow
 .nogrow:  mov       rdi, [rbp-8]
@@ -307,6 +331,10 @@ String_append:
           mov       eax, eax                 ; zero out top 32b
           mov       rcx, [rbp-16]
           mov       [rsi+rax], cl
+          mov       edx, eax
+          inc       edx
+          call      String_get_size_addr
+          mov       [rax], edx
           leave
           ret
 
@@ -335,10 +363,18 @@ String_concat:
           call      String_get_data
           mov       rsi, rax
           call      String_get_size
-          add       rsi, rax                 ; zero out top 32b
           mov       rdi, rsi
           mov       rsi, [rbp-16]
-          call      strcpy
+.loop:    mov       cl, [rsi]
+          inc       rsi
+          mov       [rdi+rax], cl
+          inc       eax
+          test      cl, cl
+          jnz       .loop
+          mov       ecx, eax
+          mov       rdi, [rbp-8]
+          call      String_get_size_addr
+          mov       [rax], edi
           leave
           ret
 
@@ -375,4 +411,50 @@ String_starts_with:
 ; String utility methods
 ;
 
+String_from_int:
+          ; stack frame
+          ; rbp-8: num; at the end, 1 if negative
+          ; rbp-16: String* new
+          push      rbp
+          mov       rbp, rsp
+          sub       rsp, 32
+          mov       [rbp-24], rdi
+          test      rdi, rdi
+          jge       String_from_int.pos
+          neg       rdi
+.pos:     mov       [rbp-8], rdi
+          mov       rdi, 24
+          call      String_ctor_empty
+          mov       [rbp-16], rax
+.loop:    mov       rax, [rbp-8]
+          mov       rcx, 7205759403792794    ; 2^56 / 10 round up
+          mul       rcx
+          shr       rax, 56
+          ror       rdx, 56
+          and       rdx, ~255
+          or        rax, rdx
+          mov       rcx, rax
+          imul      rcx, rcx, 10
+          xchg      rax, [rbp-8]
+          sub       rax, rcx
+          add       rax, 0x30
+          mov       rdi, [rbp-16]
+          mov       rsi, rax
+          call      String_append
+          mov       rax, [rbp-8]
+          test      rax, rax
+          jnz       String_from_int.loop
 
+          mov       rax, [rbp-24]
+          test      rax, rax
+          jge       String_from_int.out
+          mov       rdi, [rbp-16]
+          mov       rsi, 45
+          call      String_append
+.out:     mov       rdi, [rbp-16]
+          call      String_get_data
+          mov       rdi, rax
+          call      strrev
+          mov       rax, [rbp-16]
+          leave
+          ret
