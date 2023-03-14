@@ -72,23 +72,34 @@ malloc:
           mov       rax, rdi
           cmp       rax, 4088
           jle       malloc.z
-          mov       rax, -1
+          push      rdi
+          mov       rax, 9                  ; syscall mmap
+          mov       rsi, rdi
+          add       rsi, 8
+          mov       rdi, 0
+          mov       rdx, 7
+          mov       r10, 0x22
+          mov       r8, -1
+          mov       r9, 0
+          syscall
+          pop       rsi
+          add       rsi, 8
+          mov       [rax], rsi
+          add       rax, 8
           ret
 .z:       push      rbx
           push      r12
           push      r13
           add       rax, 8
           cmp       rax, 32
-          jge       malloc.zloop
+          jge       malloc.rndup
           mov       rax, 32
           jmp       malloc.zrax
-.zloop_e: xor       rax, rbx
-.zloop:   xor       rbx, rbx
-          sub       rbx, rax
-          and       rbx, rax
-          cmp       rax, rbx
-          jne       malloc.zloop_e
-          shl       rax, 1                  ; = z
+.rndup:   lzcnt     rcx, rax
+          sub       cl, 64
+          not       cl
+          mov       rax, 1
+          shl       rax, cl
 
 .zrax:    mov       rbx, 32                 ; = s
           mov       rcx, 0                  ; = i
@@ -182,9 +193,15 @@ malloc:
 ; chunktbl[i] = ptr
 ;
 
-free:     push      rbx
-          sub       rdi, 8                  ; rdi = ptr
+free:     sub       rdi, 8                  ; rdi = ptr
           mov       rax, [rdi]              ; rax = size
+          cmp       rax, 4096
+          jle       free.fnmmap
+          mov       rsi, rax
+          mov       rax, 11                 ; syscall munmap
+          syscall
+          ret
+.fnmmap:  push      rbx
           mov       rbx, rax                ; rbx = partner
           xor       rbx, rdi
           tzcnt     rcx, rax                ; rcx = i
